@@ -19,6 +19,8 @@ The major motivation of bbox is to easily generate any type of string representa
 * the separators for corners and coordinates: `cornerSeparator: '; '`, `coordSeparator: ', '`
 
 ```
+Bbox = require('./bbox.js');
+
 const corners = {
   bottomLeft: {
     lng: 5.98865807458,
