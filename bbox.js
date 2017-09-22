@@ -1,23 +1,24 @@
 
 class Bbox {
   constructor(params) {
-    this.assertCtorParams(params);
+    const statics = this.constructor;
+    statics.assertCtorParams(params);
     const diagonalType = params.bottomLeft && params.topRight;
     if (diagonalType) {
-      this.assertCoords(params.bottomLeft, params.topRight);
+      statics.assertCoords(params.bottomLeft, params.topRight);
       this.bottomLeft = params.bottomLeft;
       this.bottomRight = { lng: params.topRight.lng, lat: params.bottomLeft.lat };
       this.topRight = params.topRight;
       this.topLeft = { lng: params.bottomLeft.lng, lat: params.topRight.lat };
     } else {
-      this.assertCoords(params.bottomRight, params.topLeft);
+      statics.assertCoords(params.bottomRight, params.topLeft);
       this.bottomRight = params.bottomRight;
       this.bottomLeft = { lng: params.topLeft.lng, lat: params.bottomRight.lat };
       this.topLeft = params.topLeft;
       this.topRight = { lng: params.bottomRight.lng, lat: params.topLeft.lat };
     }
   }
-  assertCtorParams(params) {
+  static assertCtorParams(params) {
     if (!(
       (params.bottomLeft && params.topRight) ||
       (params.bottomRight && params.topLeft)
@@ -25,7 +26,7 @@ class Bbox {
       throw new Error('Two non-adjacent corners required to construct bounding box');
     }
   }
-  assertFactoryParams(params) {
+  static assertFactoryParams(params) {
     if (!(params instanceof Object)) {
       throw new Error('params: object required with "params"');
     }
@@ -37,7 +38,7 @@ class Bbox {
       this.assertCoordLabels(params.coords);
     }
   }
-  assertCornerLabels(corners) {
+  static assertCornerLabels(corners) {
     const cornerLabels = ['bottomRight', 'bottomLeft', 'topRight', 'topLeft'];
     corners.forEach(corner => {
       if (!cornerLabels.includes(corner)) {
@@ -45,7 +46,7 @@ class Bbox {
       }
     });
   }
-  assertCoordLabels(coords) {
+  static assertCoordLabels(coords) {
     const coordLabels = ['lng', 'lat'];
     coords.forEach(coord => {
       if (!coordLabels.includes(coord)) {
@@ -53,14 +54,14 @@ class Bbox {
       }
     });
   }
-  assertCoords(...coordObjects) {
+  static assertCoords(...coordObjects) {
     const filteredObjs = coordObjects.filter(v => !!v);
     if (filteredObjs.length === 0) {
       throw new Error('coords object required');
     }
     filteredObjs.forEach(coords => {
-      if (!(coords.hasOwnProperty('lat') && coords.hasOwnProperty('lng'))) {
-        throw new Error('Coordinate objects must have format { lng, lat }');
+      if (!(typeof coords.lat === 'number' && typeof coords.lng === 'number')) {
+        throw new Error('Coordinate objects must have format { lng: Number, lat: Number }');
       }
       if (!(coords.lat <= 90 && coords.lat >= -90)) {
         throw new Error('latitude has to be in interval [-90, 90]');
@@ -71,22 +72,24 @@ class Bbox {
     });
   }
   createCoordsString(params) {
-    this.assertCoords(params.coordsObj);
+    const statics = this.constructor;
+    statics.assertCoords(params.coordsObj);
     const coordsObj = params.coordsObj;
     const coords = params.coords && params.coords.length ? params.coords : ['lng', 'lat'];
     const separator = params.separator || ',';
     const intialString = '';
     return coords.reduce(
       (res, coord, index, array) => {
-        res += coordsObj[coord];
-        res += (index !== array.length - 1) ? separator : '';
-        return res;
+        let newRes = res + coordsObj[coord];
+        newRes += (index !== array.length - 1) ? separator : '';
+        return newRes;
       },
       intialString
     );
   }
   createBboxString(params) {
-    this.assertFactoryParams(params);
+    const statics = this.constructor;
+    statics.assertFactoryParams(params);
     const corners = params.corners;
     const coords = params.coords;
     const coordSeparator = params.coordSeparator;
@@ -94,13 +97,13 @@ class Bbox {
     const intialString = '';
     return corners.reduce(
       (res, corner, index, array) => {
-        res += this.createCoordsString({
+        let newRes = res + this.createCoordsString({
           coords,
           coordsObj: this[corner],
-          separator: coordSeparator
+          separator: coordSeparator,
         });
-        res += (index !== array.length - 1) ? cornerSeparator : '';
-        return res;
+        newRes += (index !== array.length - 1) ? cornerSeparator : '';
+        return newRes;
       },
       intialString
     );
