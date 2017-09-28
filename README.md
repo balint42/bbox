@@ -37,7 +37,7 @@ const bbox = new Bbox(corners);
 let res = bbox.createBboxString({ corners: ['bottomLeft', 'bottomRight'] });
 // res is '5.98865807458,47.3024876979;15.0169958839,47.3024876979'
 
-let res = bbox.createBboxString({ corners: ['bottomLeft', 'bottomRight','topLeft', 'topRight'] });
+res = bbox.createBboxString({ corners: ['bottomLeft', 'bottomRight','topLeft', 'topRight'] });
 // res is '5.98865807458,47.3024876979;15.0169958839,47.3024876979;5.98865807458,54.983104153;15.0169958839,54.983104153'
 
 res = bbox.createBboxString({ corners: ['bottomLeft', 'bottomRight'], coords: ['lng'] });
